@@ -1,36 +1,4 @@
-import os
-from os import path
 from setuptools import setup
-from subprocess import check_call
-from distutils.command.build import build
-from distutils.dir_util import copy_tree, remove_tree
-from setuptools.command.develop import develop
-
-def get_submodules_and_fix_paths():
-    if path.exists('.git'):
-        # Get HEAD version
-        check_call(['rm', '-rf', 'epiceditor/static/epiceditor'])
-        check_call(['git', 'reset', '--hard'])
-        # Get submodules
-        check_call(['git', 'submodule', 'init'])
-        check_call(['git', 'submodule', 'update'])
-        # Reset EpicEditor to tag 0.2.0
-        check_call(['cd', 'epiceditor/static/epiceditor', '&&', 'git', 'reset', '--hard', '0.2.0'])
-        # Move contents of epiceditor and remove .git
-        dst = "epiceditor/static/epiceditor/"
-        src = "epiceditor/static/epiceditor/epiceditor/"
-        copy_tree(src, dst)
-        remove_tree(src)
-
-class build_with_submodules(build):
-    def run(self):
-        get_submodules_and_fix_paths()
-        build.run(self)
-
-class develop_with_submodules(develop):
-    def run(self):
-        get_submodules_and_fix_paths()
-        develop.run(self)
 
 
 setup(
@@ -56,5 +24,4 @@ setup(
     'Programming Language :: Python',
     ],
   license='LICENSE',
-  cmdclass={"build": build_with_submodules, "develop": develop_with_submodules},
 )
